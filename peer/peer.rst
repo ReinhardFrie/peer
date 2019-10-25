@@ -56,17 +56,19 @@ In this exercise you will use Prism Central to stage 3 VMs which will later be u
      - **Description**
    * - *Initials*\ -**PeerMgmt**
      - Primary
-     - This server will host the Peer Management Center
+     - This server will host the Peer Management Center.
    * - *Initials*\ -**PeerAgentA**
      - Primary
-     - This server will manage the Nutanix Files cluster
+     - This server will manage the Nutanix Files cluster.
    * - *Initials*\ -**PeerAgentB**
      - Secondary
-     - This Windows File Server will be used as a target for replication
+     - This Windows File Server will be used as a target for replication.
 
 Once complete, your lab environment will resemble the diagram below:
 
 .. figure:: images/setupdiagram.png
+
+If you only have a single cluster to work with, *Initials*\ -**PeerAgentB** will also be hosted on this cluster alongside *Initials*\ -**PeerMgmt** and *Initials*\ -**PeerAgentA**. More details are included below.
 
 --------------------------------------------------------------------
 
@@ -114,8 +116,12 @@ Once complete, your lab environment will resemble the diagram below:
 
 #. **Power On** your *Initials*\ **-PeerMgmt** and *Initials*\ **-PeerAgentA** VMs.
 
+#. If you have a secondary cluster on which to set up *Initials*\ **-PeerAgentB**, continue to `Staging an Agent on your Secondary Cluster`_. If you only have a single cluster, repeat steps 2-4 to create *Initials*\ **-PeerAgentB** then skip to `Windows File Server`_.
+
 --------------------------------------------------------
 
+Staging an Agent on your Secondary Cluster
+..........................................
 #. Log in to your **Secondary Prism Central** and create the following VM:
 
    - **Name** - *Initials*\ -PeerAgentB
@@ -151,13 +157,13 @@ Once complete, your lab environment will resemble the diagram below:
    - **Username** - Administrator
    - **Password** - nutanix/4u
 
-#. Open **PowerShell** and execute the following command, replacing **10.XX.YY.40** with the IP address of your primary cluster's **AutoDC2** (Domain Controller) VM:
+#. Open **PowerShell** and execute the following command, replacing **10.XX.YY.41** with the IP address of your primary cluster's **AutoDC2** (Domain Controller) VM:
 
    .. code-block:: Powershell
      :emphasize-lines: 1
 
      # Updates your network adapter to use your Primary cluster DC for DNS
-     Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddress "10.XX.YY.40"
+     Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddress "10.XX.YY.41"
 
    .. note::
 
@@ -165,7 +171,7 @@ Once complete, your lab environment will resemble the diagram below:
 
 #. Run ``ipconfig /all`` and verify your **DNS Server** is set to the IP address of the **AutoDC2** VM on your primary cluster.
 
-#. Execute the following to join the domain and reboot *Initials*\ **PeerAgentB**:
+#. Execute the following to join the domain and reboot *Initials*\ **-PeerAgentB**:
 
    .. code-block:: Powershell
      :emphasize-lines: 1
@@ -255,14 +261,14 @@ Installing Peer Management Center
 
 In this exercise you'll walk through the installation of Peer Management Center (PMC). PMC serves as the centralized management component for the Peer Global File Service.
 
-PMC does not store any file data but does facilitate communication between locations so it should be deployed at a location with the best connectivity. A single deployment of PMC can manage 50 or more Agents/file servers.
+PMC does not store any file data but does facilitate communication between locations so it should be deployed at a location with the best connectivity. A single deployment of PMC can manage 100 or more Agents/file servers.
 
 #. Connect to your *Initials*\ -**PeerMgmt** VM on your **Primary** cluster via RDP or VM console using the following credentials:
 
    - **Username** - NTNXLAB\\Administrator
    - **Password** - nutanix/4u
 
-#. Within the VM, download **PMC_Installer_Win64.exe** AND **PeerGlobalFileService\*.lic** from http://10.42.194.11/workshop_staging/peer/.
+#. Within the VM, download **PMC_Installer_Win64.exe** AND the **.lic** file from http://10.42.194.11/workshop_staging/peer/.
 
 #. Run **PMC_Installer_Win64.exe** and proceed with the default selections **UNTIL** you reach **Peer Management Center Web Server Configuration**.
 
@@ -278,7 +284,7 @@ PMC does not store any file data but does facilitate communication between locat
 
    Once services have started, the PMC Client will open and prompt for a license file.
 
-#. Click **Add/Update**, browse to the previously downloaded **PeerGlobalFileService\*.lic** file and click **Open**.
+#. Click **Add/Update**, browse to the previously downloaded **.lic** file and click **Open**.
 
    .. figure:: images/11.png
 
@@ -417,7 +423,7 @@ Files and PeerAgentA
 
    - **Peer Agent IP** - *Initials*\ -PeerAgentA IP Address
 
-     *The IP address of the Agent server that will receive real-time notifications from the Files File Activity Monitoring API.*
+     *The IP address of the Agent server that will receive real-time notifications from the Files File Activity Monitoring API. It will be selectable from a dropdown list of available IPs on this Agent server.*
 
 #. Click **Validate** to confirm Files can be accessed via API using the provided credentials.
 
@@ -538,7 +544,7 @@ Testing the Share
 
 .. note::
 
-  This exercise requires the :ref:`windows_tools_vm`. Alternatively you can install OpenOffice Writer or Microsoft Word within your PMC VM.
+  This exercise requires the :ref:`windows_tools_vm`. If you do not have an *Initials*\ **-Windows-ToolsVM**, you can perform the tests below from your *Initials*\ **-PeerMgmt** VM. If you go this route and want to test locking (steps 6 through 8 below), you must also install OpenOffice Writer or Microsoft Word on *Initials*\ **-PeerMgmt**. An OpenOffice installer can obtained from http://10.42.194.11/workshop_staging/peer/.
 
 The easiest way to verify synchronization is functioning properly is to open 2 different File Explorer windows to the respective Nutanix Files and Windows File Server paths.
 
@@ -666,32 +672,34 @@ As this tool is primarily for our partners, we would love to hear any feedback y
 
      Report download links are only active for **24 hours**. Contact Peer Software to access any expired reports.
 
-     Some systems may open these workbooks in a protected mode, displaying this message in Excel:
+   Some systems may open these workbooks in a protected mode, displaying this message in Excel:
+
    .. figure:: images/fsa8.png
-     If you see this message at the top of Excel, click Enable Editing to fully open the workbook. If you do not do this, the pivot tables and charts will not load properly.
+
+   If you see this message at the top of Excel, click **Enable Editing** to fully open the workbook. If you do not do this, the pivot tables and charts will not load properly.
 
    The full report contains the following information:
 
-   -	**Overview** – A series of pivot tables and charts showing high level statistics about the path that was scanned.
-   -	**Analysis** – Includes a pivot table and a pair of charts highlighting additional statistics about the path that was scanned.
-   -	**InfoSheet** – Details about this specific scan.
-   -	**OverallStats** – Overall statistics for the folder that was scanned. This includes total bytes, files, folders, etc.
-   -	**HighSubFolderCounts** – A list of all folders containing more than 1000 child directories.
-   -	**HighByteCounts** – A list of all folders containing more than 100GB of child file data.
-   -	**HighFileCounts** – A list of all folders containing more than 10,000 child files.
-   -	**LargeFiles** – A list of all discovered files that are 10GB or larger.
-   -	**DeepPaths** – A list of all paths discovered that are 20 levels deep or deeper.
-   -	**ReparsePointsSummary** – A summary of all reparse points discovered, regardless of file or folder.
-   -	**ReparsePoints** – A list of all folder reparse points discovered.
-   -	**TimeAnalysis** – A breakdown of total files, folders, and bytes by age.
-   -	**TLDAnalysis** - A list of each folder immediately under a specified path with statistics for each of these subfolders. In a user home directory environment, each of these subfolders should represent a different user.
-   -	**TopTLDsByTotals** – A series of pivot tables and charts showing the top 10 top-level directories based on total bytes used, total files, and total folders.
-   -	**TopTLDsByLastModBytes** – A pivot table and chart showing top 10 top-level directories based on most bytes modified in the past year.
-   -	**TopTLDsByLastModFiles** – A pivot table and chart showing top 10 top-level directories based on most files modified in the past year.
-   -	**LegacyTLDs** – A list of all top-level directories that do not contain any files modified in the past 365 days.
-   -	**TreeDepth** – A tally of bytes, folders, and files found at each depth level of the folder structure. For customers doing a pre-migration analysis, depths that are showing as green are good candidates for PeerSync Migration’s tree depth setting.
-   -	**FileExtInfo** – A list of all discovered extensions, including pivot tables sorted by total bytes and total files.
-   -	**FileAttributes** – A summary of all file and folder attributes found.
+   - **Overview** – A series of pivot tables and charts showing high level statistics about the path that was scanned.
+   - **Analysis** – Includes a pivot table and a pair of charts highlighting additional statistics about the path that was scanned.
+   - **InfoSheet** – Details about this specific scan.
+   - **OverallStats** – Overall statistics for the folder that was scanned. This includes total bytes, files, folders, etc.
+   - **HighSubFolderCounts** – A list of all folders containing more than 1000 child directories.
+   - **HighByteCounts** – A list of all folders containing more than 100GB of child file data.
+   - **HighFileCounts** – A list of all folders containing more than 10,000 child files.
+   - **LargeFiles** – A list of all discovered files that are 10GB or larger.
+   - **DeepPaths** – A list of all paths discovered that are 20 levels deep or deeper.
+   - **ReparsePointsSummary** – A summary of all reparse points discovered, regardless of file or folder.
+   - **ReparsePoints** – A list of all folder reparse points discovered.
+   - **TimeAnalysis** – A breakdown of total files, folders, and bytes by age.
+   - **TLDAnalysis** - A list of each folder immediately under a specified path with statistics for each of these subfolders. In a user home directory environment, each of these subfolders should represent a different user.
+   - **TopTLDsByTotals** – A series of pivot tables and charts showing the top 10 top-level directories based on total bytes used, total files, and total folders.
+   - **TopTLDsByLastModBytes** – A pivot table and chart showing top 10 top-level directories based on most bytes modified in the past year.
+   - **TopTLDsByLastModFiles** – A pivot table and chart showing top 10 top-level directories based on most files modified in the past year.
+   - **LegacyTLDs** – A list of all top-level directories that do not contain any files modified in the past 365 days.
+   - **TreeDepth** – A tally of bytes, folders, and files found at each depth level of the folder structure. For customers doing a pre-migration analysis, depths that are showing as green are good candidates for PeerSync Migration’s tree depth setting.
+   - **FileExtInfo** – A list of all discovered extensions, including pivot tables sorted by total bytes and total files.
+   - **FileAttributes** – A summary of all file and folder attributes found.
 
    .. figure:: images/fsa7.png
 
@@ -700,7 +708,7 @@ Takeaways
 
 - Peer Global File Service is the only solution which can provide Active-Active replication for Nutanix Files clusters.
 
-- Peer also supports multiple legacy NAS platforms, allowing for replication within mixed environments or easing migration to Nutanix Files.
+- Peer also supports multiple legacy NAS platforms and supports replication within mixed environments. This helps ease adoption of and migration to Nutanix Files.
 
 - Peer can directly manage Microsoft Distributed File Services (DFS) namespaces, allowing multiple file servers to be presented through a single namespace. This is a key component for supporting true Active-Active DR solutions for file sharing.
 
