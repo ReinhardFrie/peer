@@ -1,4 +1,4 @@
-.. title:: Peer and Nutanix
+.. title:: Peer, HYCU and Nutanix Files
 
 .. toctree::
    :maxdepth: 2
@@ -10,14 +10,30 @@
 
 .. toctree::
    :maxdepth: 2
+   :caption: HYCU
+   :name: _peer
+   :hidden:
+
+   hycu/hycu/hycu
+
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: File
+   :name: _peer
+   :hidden:
+
+   files/files
+
+.. toctree::
+   :maxdepth: 2
    :caption: Appendix
    :name: _appendix
    :hidden:
 
    tools_vms/windows_tools_vm
    tools_vms/linux_tools_vm
-   taskman/taskman
-   wordpress/wordpress
 
 
 .. _getting_started:
