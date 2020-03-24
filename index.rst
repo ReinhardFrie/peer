@@ -2,6 +2,14 @@
 
 .. toctree::
    :maxdepth: 2
+   :caption: File
+   :name: _peer
+   :hidden:
+
+   files/files
+
+.. toctree::
+   :maxdepth: 2
    :caption: Peer
    :name: _peer
    :hidden:
@@ -15,16 +23,6 @@
    :hidden:
 
    hycu/hycu/hycu
-
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: File
-   :name: _peer
-   :hidden:
-
-   files/files
 
 .. toctree::
    :maxdepth: 2
